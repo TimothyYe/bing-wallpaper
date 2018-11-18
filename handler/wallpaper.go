@@ -19,12 +19,24 @@ const (
 
 var (
 	resolutionMap map[string]string
+	markets       map[string]bool
 )
 
 func init() {
 	resolutionMap = map[string]string{}
 	resolutionMap["1366"] = "1366x768.jpg"
 	resolutionMap["1920"] = "1920x1080.jpg"
+
+	markets = map[string]bool{
+		"en-US": true,
+		"zh-CN": true,
+		"ja-JP": true,
+		"en-AU": true,
+		"en-UK": true,
+		"de-DE": true,
+		"en-NZ": true,
+		"en-CA": true,
+	}
 }
 
 // RootHandler handles default API requests
@@ -73,7 +85,7 @@ func RootHandler(c *gin.Context) {
 	}
 
 	if format == "image" {
-		// redirect to image URL
+		// redirect to image URL directly
 		c.Redirect(http.StatusTemporaryRedirect, response.URL)
 		return
 	}
