@@ -1,7 +1,7 @@
 package run
 
 import (
-	"bing-wallpaper/handlers"
+	"bing-wallpaper/handler"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -18,7 +18,7 @@ var Cmd = &cobra.Command{
 func run(cmd *cobra.Command, args []string) {
 	router := gin.Default()
 
-	router.GET("/", handlers.RootHandler)
+	router.GET("/", handler.RootHandler)
 
 	router.Run(":7000")
 	fmt.Println("API is running...")
