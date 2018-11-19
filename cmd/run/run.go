@@ -20,6 +20,6 @@ func run(cmd *cobra.Command, args []string) {
 
 	router.GET("/", handler.RootHandler)
 
-	router.Run(":7000")
+	router.Run(":9000")
 	fmt.Println("API is running...")
 }
