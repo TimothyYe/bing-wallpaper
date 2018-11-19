@@ -1,8 +1,9 @@
 package run
 
 import (
-	"bing-wallpaper/handler"
 	"fmt"
+
+	"github.com/TimothyYe/bing-wallpaper/handler"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"

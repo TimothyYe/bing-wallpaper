@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"bing-wallpaper/cmd/run"
+	"github.com/TimothyYe/bing-wallpaper/cmd/run"
 
 	"github.com/spf13/cobra"
 )

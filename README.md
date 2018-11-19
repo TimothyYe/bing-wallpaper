@@ -49,7 +49,7 @@ background-repeat: no-repeat;
 
 ### Build it
 ```bash
-git clone https://github.com/timothyye/bing-wallpaper.git
+git clone https://github.com/TimothyYe/bing-wallpaper.git
 make build
 ```
 

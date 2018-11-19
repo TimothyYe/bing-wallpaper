@@ -1,11 +1,12 @@
 package handler
 
 import (
-	"bing-wallpaper/model"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+
+	"github.com/TimothyYe/bing-wallpaper/model"
 
 	"github.com/beevik/etree"
 
