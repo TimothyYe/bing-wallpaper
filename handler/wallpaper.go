@@ -14,7 +14,7 @@ import (
 
 const (
 	bingURL = `https://www.bing.com`
-	bingAPI = `https://www.bing.com/HPImageArchive.aspx?format=xml&idx=%s&n=1&mkt=en-US`
+	bingAPI = `https://www.bing.com/HPImageArchive.aspx?format=xml&idx=%s&n=1&mkt=%s`
 )
 
 var (
@@ -44,6 +44,7 @@ func RootHandler(c *gin.Context) {
 	resolution := c.DefaultQuery("resolution", "1920")
 	format := c.DefaultQuery("format", "json")
 	index := c.DefaultQuery("index", "0")
+	mkt := c.DefaultQuery("mkt", "zh-CN")
 
 	// check index
 	_, err := strconv.Atoi(index)
@@ -65,7 +66,13 @@ func RootHandler(c *gin.Context) {
 		return
 	}
 
-	resp, err := http.Get(fmt.Sprintf(bingAPI, index))
+	// check mkt
+	if !markets[mkt] {
+		c.String(http.StatusInternalServerError, "mkt parameter is invalid")
+		return
+	}
+
+	resp, err := http.Get(fmt.Sprintf(bingAPI, index, mkt))
 	if err != nil {
 		c.String(http.StatusInternalServerError, "failed to request bing.com")
 		return
