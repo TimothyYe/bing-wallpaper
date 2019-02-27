@@ -11,7 +11,7 @@ A RESTful API to fetch daily wallpaper from Bing.com
 ### Parameters
 
 * `resolution` The resolution of wallpaper image. `1920` is the default value, you can also use `1366`.
-* `format` The response format, can be `json` or `image`. __If response format is set as `image`, you will be redirected to the wallpaper image directly.
+* `format` The response format, can be `json` or `image`. __If response format is set as `image`, you will be redirected to the wallpaper image directly__.
 * `index` The index of wallpaper, starts from 0.
 * `mkt` The region parameter, default is `zh-CN`, you can also use `en-US`, `ja-JP`, `en-AU`, `en-UK`, `de-DE`, `en-NZ`, `en-CA`.
 
@@ -44,6 +44,12 @@ background-image: url(https://bing.biturl.top/?resolution=1920&format=image&inde
 background-size: 100%;
 background-repeat: no-repeat;
 ```
+
+__Demo__  
+
+[https://biturl.top](https://biturl.top)
+
+![https://github.com/TimothyYe/biturl/blob/master/screenshots/1.jpg?raw=true](https://github.com/TimothyYe/biturl/blob/master/screenshots/1.jpg?raw=true)
 
 ## For development
 
