@@ -53,6 +53,8 @@ __Demo__
 
 ## Run with docker
 
+Get the code and build docker image:
+
 ```bash
 git clone https://github.com/TimothyYe/bing-wallpaper.git
 make release
