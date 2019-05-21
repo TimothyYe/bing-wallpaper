@@ -51,6 +51,19 @@ __Demo__
 
 ![https://github.com/TimothyYe/biturl/blob/master/screenshots/1.jpg?raw=true](https://github.com/TimothyYe/biturl/blob/master/screenshots/1.jpg?raw=true)
 
+## Run with docker
+
+```bash
+git clone https://github.com/TimothyYe/bing-wallpaper.git
+make release
+```
+
+Start the container with the image name & tag (YYYYMMDD), for example:
+
+```bash
+docker run -d --name=bing-wallpaper --restart=always -p 9000:9000 r.xiaozhou.net/projects/bing:20190521
+```
+
 ## For development
 
 ### Build it
