@@ -1,6 +1,8 @@
-FROM golang:1.10-alpine as builder
+FROM golang:1.12.5-alpine as builder
 ARG VERSION
-WORKDIR /go/src/bing-wallpaper
+RUN mkdir -p /go/src/github.com/TimothyYe/bing-wallpaper
+WORKDIR /go/src/github.com/TimothyYe/bing-wallpaper
+RUN cd /go/src/github.com/TimothyYe/bing-wallpaper
 COPY . .
 RUN go build -o ./bw/bw ./bw/main.go
 
@@ -16,7 +18,7 @@ RUN mkdir /lib64 && ln -s /lib/libc.musl-x86_64.so.1 /lib64/ld-linux-x86-64.so.2
 
 RUN mkdir /bw
 WORKDIR /bw
-COPY --from=builder /go/src/bing-wallpaper/bw/bw /bw/bw
+COPY --from=builder /go/src/github.com/TimothyYe/bing-wallpaper/bw/bw /bw/bw
 
 EXPOSE 9000
 ENTRYPOINT ["/bw/bw", "run"]

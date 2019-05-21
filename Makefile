@@ -5,7 +5,6 @@ DATE=`date +%Y%m%d`
 build:
 		go build -o ./bw/${BINARY} ./bw/main.go
 release:
-		go build -o ./bw/${BINARY} ./bw/main.go
 		# Build image
 		docker build -t "r.xiaozhou.net/projects/bing:${DATE}" -f Dockerfile .
 		docker push "r.xiaozhou.net/projects/bing:${DATE}"
