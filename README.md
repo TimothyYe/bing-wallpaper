@@ -41,8 +41,11 @@ You can also use this API to set CSS background image:
 
 ```text
 background-image: url(https://bing.biturl.top/?resolution=1920&format=image&index=0&mkt=zh-CN);
-background-size: 100%;
+height: 100%;
+background-position: center;
 background-repeat: no-repeat;
+background-image: url("img_girl.jpg");
+background-size: cover;
 ```
 
 __Demo__  
