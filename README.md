@@ -66,7 +66,7 @@ make release
 Start the container with the image name & tag (YYYYMMDD), for example:
 
 ```bash
-docker run -d --name=bing-wallpaper --restart=always -p 9000:9000 r.xiaozhou.net/projects/bing:20190521
+docker run -d --name=bing-wallpaper --restart=always -p 9000:9000 timothyye/bing:latest
 ```
 
 ## For development
