@@ -1,9 +1,15 @@
 FROM golang:1.12.5-alpine as builder
 ARG VERSION
+ENV GO111MODULE=on
 RUN mkdir -p /go/src/github.com/TimothyYe/bing-wallpaper
 WORKDIR /go/src/github.com/TimothyYe/bing-wallpaper
 RUN cd /go/src/github.com/TimothyYe/bing-wallpaper
 COPY . .
+RUN apk --no-cache add git \
+	&& go get github.com/beevik/etree \
+	&& go get github.com/gin-gonic/gin \
+	&& go get github.com/spf13/cobra \
+	&& apt del git
 RUN go build -o ./bw/bw ./bw/main.go
 
 
