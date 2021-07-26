@@ -8,6 +8,8 @@ release:
 		# Build image
 		docker build -t "timothyye/bing:${DATE}" -f Dockerfile .
 		docker push "timothyye/bing:${DATE}"
+test:
+		go test .
 # Cleans our projects: deletes binaries
 clean:
 		rm -rf ./bw/bw
