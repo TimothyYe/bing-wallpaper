@@ -1,4 +1,4 @@
-package model
+package bing_wallpaper
 
 type Response struct {
 	StartDate     string `json:"start_date"`
