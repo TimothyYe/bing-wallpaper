@@ -44,7 +44,6 @@ background-image: url(https://bing.biturl.top/?resolution=1920&format=image&inde
 height: 100%;
 background-position: center;
 background-repeat: no-repeat;
-background-image: url("img_girl.jpg");
 background-size: cover;
 ```
 
