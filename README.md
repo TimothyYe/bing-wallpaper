@@ -13,7 +13,7 @@ A RESTful API to fetch daily wallpaper from Bing.com
 * `resolution` The resolution of wallpaper image. `1920` is the default value, you can also use `1366` and `3840`(4K resolution).
 * `format` The response format, can be `json` or `image`. __If response format is set as `image`, you will be redirected to the wallpaper image directly__.
 * `index` The index of wallpaper, starts from 0. By default, `0` means to get today's image, `1` means to get the image of yesterday, and so on.
-* `mkt` The region parameter, default is `zh-CN`, you can also use `en-US`, `ja-JP`, `en-AU`, `en-UK`, `de-DE`, `en-NZ`, `en-CA`.
+* `mkt` The region parameter, the default value is `zh-CN`, you can also use `en-US`, `ja-JP`, `en-AU`, `en-UK`, `de-DE`, `en-NZ`, `en-CA`.
 
 ### Example
 
