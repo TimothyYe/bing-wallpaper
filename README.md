@@ -55,14 +55,13 @@ __Demo__
 
 ## Run with docker
 
-Get the code and build docker image:
+Get the latest version of docker image:
 
 ```bash
-git clone https://github.com/TimothyYe/bing-wallpaper.git
-make release
+docker pull timothyye/bing:latest
 ```
 
-Start the container with the image name & tag (YYYYMMDD), for example:
+Start the container with the image name & tag (YYYYMMDD or latest), for example:
 
 ```bash
 docker run -d --name=bing-wallpaper --restart=always -p 9000:9000 timothyye/bing:latest
