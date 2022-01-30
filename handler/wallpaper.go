@@ -1,12 +1,41 @@
 package handler
 
 import (
-	bing_wallpaper "github.com/TimothyYe/bing-wallpaper"
+	"math/rand"
 	"net/http"
 	"strconv"
 
+	bing_wallpaper "github.com/TimothyYe/bing-wallpaper"
+
 	"github.com/gin-gonic/gin"
 )
+
+const (
+	random = "random"
+)
+
+var (
+	marketMap = map[int]string{
+		0: "zh-CN",
+		1: "en-US",
+		2: "ja-JP",
+		3: "en-AU",
+		4: "en-UK",
+		5: "de-DE",
+		6: "en-NZ",
+		7: "en-CA",
+	}
+)
+
+func getRandomIndex() int {
+	min := 0
+	max := 7
+	return rand.Intn(max-min+1) + min
+}
+
+func getRandomMarket() string {
+	return marketMap[getRandomIndex()]
+}
 
 // RootHandler handles default API requests
 func RootHandler(c *gin.Context) {
@@ -14,6 +43,16 @@ func RootHandler(c *gin.Context) {
 	format := c.DefaultQuery("format", "json")
 	index := c.DefaultQuery("index", "0")
 	mkt := c.DefaultQuery("mkt", "zh-CN")
+
+	// handle the random index
+	if index == random {
+		index = strconv.Itoa(getRandomIndex())
+	}
+
+	// handle the random market parameter
+	if mkt == random {
+		mkt = getRandomMarket()
+	}
 
 	// check index
 	uIndex, err := strconv.ParseUint(index, 10, 64)
