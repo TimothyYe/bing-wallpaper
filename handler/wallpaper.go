@@ -20,16 +20,17 @@ var (
 		1: "en-US",
 		2: "ja-JP",
 		3: "en-AU",
-		4: "en-UK",
+		4: "en-GB",
 		5: "de-DE",
 		6: "en-NZ",
 		7: "en-CA",
+		8: "en-IN",
 	}
 )
 
 func getRandomIndex() int {
 	min := 0
-	max := 7
+	max := 8
 	return rand.Intn(max-min+1) + min
 }
 
