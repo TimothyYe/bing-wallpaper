@@ -35,6 +35,8 @@ func init() {
 		"en-NZ": true,
 		"en-CA": true,
 		"en-IN": true,
+		"fr-FR": true,
+		"fr-CA": true,
 	}
 }
 
