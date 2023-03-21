@@ -73,6 +73,7 @@ func RootHandler(c *gin.Context) {
 	response, err := bing_wallpaper.Get(uint(uIndex), mkt, resolution)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
+		return
 	}
 
 	// redirect to image URL directly
