@@ -1,11 +1,11 @@
-FROM golang:1.12.5-alpine as builder
+FROM golang:1.20.2-alpine3.17 as builder
 ARG VERSION
 RUN mkdir -p /go/src/github.com/TimothyYe/bing-wallpaper
 WORKDIR /go/src/github.com/TimothyYe/bing-wallpaper
 RUN cd /go/src/github.com/TimothyYe/bing-wallpaper
 COPY . .
 RUN apk --no-cache add git build-base make gcc libtool musl-dev \
-    && GO111MODULE=on go build -o ./bw/bw ./bw/main.go
+	&& GO111MODULE=on go build -o ./bw/bw ./bw/main.go
 
 
 FROM alpine
