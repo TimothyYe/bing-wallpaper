@@ -1,11 +1,16 @@
 package bing_wallpaper
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
-	"github.com/beevik/etree"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"time"
+
+	"github.com/allegro/bigcache/v3"
+	"github.com/beevik/etree"
 )
 
 const (
@@ -16,6 +21,7 @@ const (
 var (
 	Resolution map[string]string
 	Markets    map[string]bool
+	cache      *bigcache.BigCache
 )
 
 func init() {
@@ -38,6 +44,25 @@ func init() {
 		"fr-FR": true,
 		"fr-CA": true,
 	}
+
+	// initialize the cache
+	config := bigcache.Config{
+		Shards:             128,
+		LifeWindow:         60 * time.Minute,
+		CleanWindow:        10 * time.Minute,
+		MaxEntriesInWindow: 30 * 60,
+		MaxEntrySize:       50,
+		Verbose:            true,
+		HardMaxCacheSize:   256,
+		OnRemove:           nil,
+		OnRemoveWithReason: nil,
+	}
+
+	var initErr error
+	cache, initErr = bigcache.New(context.Background(), config)
+	if initErr != nil {
+		log.Fatal(initErr)
+	}
 }
 
 // Get bing.com wallpaper from bing api
@@ -48,6 +73,13 @@ func Get(index uint, market, resolution string) (*Response, error) {
 
 	if _, ok := Markets[market]; !ok {
 		return nil, fmt.Errorf("market %s is not supported", market)
+	}
+
+	// query cache first
+	if value, err := cache.Get(fmt.Sprintf("%d_%s_%s", index, market, resolution)); err == nil {
+		cachedResp := &Response{}
+		_ = json.Unmarshal(value, cachedResp)
+		return cachedResp, nil
 	}
 
 	client := &http.Client{
@@ -80,11 +112,18 @@ func Get(index uint, market, resolution string) (*Response, error) {
 	// get image element
 	imgElem := doc.SelectElement("images").SelectElement("image")
 
-	return &Response{
+	response := &Response{
 		StartDate:     imgElem.SelectElement("startdate").Text(),
 		EndDate:       imgElem.SelectElement("enddate").Text(),
 		URL:           fmt.Sprintf("%s%s_%s", bingURL, imgElem.SelectElement("urlBase").Text(), Resolution[resolution]),
 		Copyright:     imgElem.SelectElement("copyright").Text(),
 		CopyrightLink: imgElem.SelectElement("copyrightlink").Text(),
-	}, nil
+	}
+
+	// cache the response
+	if value, err := json.Marshal(response); err == nil {
+		_ = cache.Set(fmt.Sprintf("%d_%s_%s", index, market, resolution), value)
+	}
+
+	return response, nil
 }
