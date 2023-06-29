@@ -42,6 +42,7 @@ func getRandomMarket() string {
 func RootHandler(c *gin.Context) {
 	resolution := c.DefaultQuery("resolution", "1920")
 	format := c.DefaultQuery("format", "json")
+	imageFormat := c.DefaultQuery("image_format", "jpg")
 	index := c.DefaultQuery("index", "0")
 	mkt := c.DefaultQuery("mkt", "zh-CN")
 
@@ -69,11 +70,21 @@ func RootHandler(c *gin.Context) {
 		return
 	}
 
+	if imageFormat != "jpg" && imageFormat != "webp" {
+		c.String(http.StatusInternalServerError, "image_format parameter is invalid, should be jpg or webp")
+		return
+	}
+
 	// fetch bing information
 	response, err := bing_wallpaper.Get(uint(uIndex), mkt, resolution)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
+	}
+
+	// check the image format
+	if imageFormat == "webp" {
+		response.URL = response.URL[:len(response.URL)-3] + "webp"
 	}
 
 	// redirect to image URL directly
