@@ -51,17 +51,20 @@ func init() {
 	}
 
 	Markets = map[string]bool{
-		"en-US": true,
-		"zh-CN": true,
-		"ja-JP": true,
-		"en-AU": true,
-		"en-GB": true,
-		"de-DE": true,
-		"en-NZ": true,
-		"en-CA": true,
-		"en-IN": true,
-		"fr-FR": true,
-		"fr-CA": true,
+		"en-US":  true,
+		"zh-CN":  true,
+		"ja-JP":  true,
+		"en-AU":  true,
+		"en-GB":  true,
+		"de-DE":  true,
+		"en-NZ":  true,
+		"en-CA":  true,
+		"en-IN":  true,
+		"fr-FR":  true,
+		"fr-CA":  true,
+		"it-IT":  true,
+		"es-ES":  true,
+		"en-ROW": true,
 	}
 
 	// initialize the cache

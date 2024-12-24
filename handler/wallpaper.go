@@ -16,21 +16,26 @@ const (
 
 var (
 	marketMap = map[int]string{
-		0: "zh-CN",
-		1: "en-US",
-		2: "ja-JP",
-		3: "en-AU",
-		4: "en-GB",
-		5: "de-DE",
-		6: "en-NZ",
-		7: "en-CA",
-		8: "en-IN",
+		0:  "zh-CN",
+		1:  "en-US",
+		2:  "ja-JP",
+		3:  "en-AU",
+		4:  "en-GB",
+		5:  "de-DE",
+		6:  "en-NZ",
+		7:  "en-CA",
+		8:  "en-IN",
+		9:  "fr-FR",
+		10: "fr-CA",
+		11: "it-IT",
+		12: "es-ES",
+		13: "en-ROW",
 	}
 )
 
 func getRandomIndex() int {
 	min := 0
-	max := 8
+	max := 13
 	return rand.Intn(max-min+1) + min
 }
 
