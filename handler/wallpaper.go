@@ -29,13 +29,14 @@ var (
 		10: "fr-CA",
 		11: "it-IT",
 		12: "es-ES",
-		13: "en-ROW",
+		13: "pt-BR",
+		14: "en-ROW",
 	}
 )
 
 func getRandomIndex() int {
 	min := 0
-	max := 13
+	max := 14
 	return rand.Intn(max-min+1) + min
 }
 

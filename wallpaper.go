@@ -64,6 +64,7 @@ func init() {
 		"fr-CA":  true,
 		"it-IT":  true,
 		"es-ES":  true,
+		"pt-BR":  true,
 		"en-ROW": true,
 	}
 
