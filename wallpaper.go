@@ -21,7 +21,6 @@ const (
 var (
 	Resolution     map[string]string
 	FullResolution map[string]string
-	Markets        map[string]bool
 	cache          *bigcache.BigCache
 )
 
@@ -48,24 +47,6 @@ func init() {
 		"400x240":   "400x240.jpg",
 		"320x240":   "320x240.jpg",
 		"240x320":   "240x320.jpg",
-	}
-
-	Markets = map[string]bool{
-		"en-US":  true,
-		"zh-CN":  true,
-		"ja-JP":  true,
-		"en-AU":  true,
-		"en-GB":  true,
-		"de-DE":  true,
-		"en-NZ":  true,
-		"en-CA":  true,
-		"en-IN":  true,
-		"fr-FR":  true,
-		"fr-CA":  true,
-		"it-IT":  true,
-		"es-ES":  true,
-		"pt-BR":  true,
-		"en-ROW": true,
 	}
 
 	// initialize the cache
@@ -108,10 +89,6 @@ func Get(index uint, market, resolution string) (*Response, error) {
 	}
 
 	fmt.Println("resolution: ", resolution)
-
-	if _, ok := Markets[market]; !ok {
-		return nil, fmt.Errorf("market %s is not supported", market)
-	}
 
 	// query cache first
 	if value, err := cache.Get(fmt.Sprintf("%d_%s_%s", index, market, resolution)); err == nil {
