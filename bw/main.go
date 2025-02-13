@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
 	"os"
-	"time"
 
 	"github.com/TimothyYe/bing-wallpaper/cmd/run"
 
@@ -31,8 +29,6 @@ func init() {
 }
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
-
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
