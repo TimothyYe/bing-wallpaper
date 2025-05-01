@@ -1,6 +1,7 @@
 ## Bing Wallpaper API
 
 A RESTful API to fetch daily wallpaper from Bing.com
+[中文版README](README_CN.md)
 
 ## Usage
 
