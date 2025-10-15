@@ -36,12 +36,14 @@ var (
 
 func getRandomIndex() int {
 	min := 0
-	max := 14
+	max := 7
 	return rand.Intn(max-min+1) + min
 }
 
 func getRandomMarket() string {
-	return marketMap[getRandomIndex()]
+	min := 0
+	max := 14
+	return marketMap[rand.Intn(max-min+1)+min]
 }
 
 // RootHandler handles default API requests
