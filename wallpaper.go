@@ -89,8 +89,6 @@ func Get(index uint, market, resolution string) (*Response, error) {
 		resolution = FullResolution[resolution]
 	}
 
-	fmt.Println("resolution: ", resolution)
-
 	// query cache first
 	if value, err := cache.Get(fmt.Sprintf("%d_%s_%s", index, market, resolution)); err == nil {
 		cachedResp := &Response{}
@@ -107,7 +105,7 @@ func Get(index uint, market, resolution string) (*Response, error) {
 		return nil, err
 	}
 	request.Header.Add("Referer", bingURL)
-	request.Header.Add("User-Agent", `Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 10.0; WOW64; Trident/8.0; .NET4.0C; .NET4.0E)`)
+	request.Header.Add("User-Agent", `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0`)
 
 	resp, err := client.Do(request)
 	if err != nil {
@@ -125,8 +123,16 @@ func Get(index uint, market, resolution string) (*Response, error) {
 		return nil, err
 	}
 
-	// get image element
-	imgElem := doc.SelectElement("images").SelectElement("image")
+	// get image element - root element is "images"
+	root := doc.Root()
+	if root == nil {
+		return nil, fmt.Errorf("failed to parse XML response from %s", bingURL)
+	}
+
+	imgElem := root.SelectElement("image")
+	if imgElem == nil {
+		return nil, fmt.Errorf("failed to find 'image' element in response from %s", bingURL)
+	}
 
 	response := &Response{
 		StartDate:     imgElem.SelectElement("startdate").Text(),
