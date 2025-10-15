@@ -6,7 +6,7 @@ build:
 		go build -o ./bw/${BINARY} ./bw/main.go
 release:
 		# Build image
-		docker build -t "timothyye/bing:${DATE}" .
+		docker build --platform linux/amd64 -t "timothyye/bing:${DATE}" .
 		docker push "timothyye/bing:${DATE}"
 test:
 		go test .
