@@ -28,6 +28,7 @@ UHD
 1024x768
 800x600
 800x480
+1080x1920 (Portrait mode)
 768x1280 (Portrait mode)
 720x1280 (Portrait mode)
 640x480
