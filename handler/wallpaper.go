@@ -1,9 +1,10 @@
 package handler
 
 import (
-	"math/rand"
+	"math/rand/v2"
 	"net/http"
 	"strconv"
+	"strings"
 
 	bing_wallpaper "github.com/TimothyYe/bing-wallpaper"
 
@@ -35,15 +36,11 @@ var (
 )
 
 func getRandomIndex() int {
-	min := 0
-	max := 7
-	return rand.Intn(max-min+1) + min
+	return rand.IntN(8)
 }
 
 func getRandomMarket() string {
-	min := 0
-	max := 14
-	return marketMap[rand.Intn(max-min+1)+min]
+	return marketMap[rand.IntN(len(marketMap))]
 }
 
 // RootHandler handles default API requests
@@ -67,32 +64,31 @@ func RootHandler(c *gin.Context) {
 	// check index
 	uIndex, err := strconv.ParseUint(index, 10, 64)
 	if err != nil {
-		// input index is invalid
-		c.String(http.StatusInternalServerError, "the image index is invalid")
+		c.String(http.StatusBadRequest, "the image index is invalid")
 		return
 	}
 
 	// check format
 	if format != "json" && format != "image" {
-		c.String(http.StatusInternalServerError, "format parameter is invalid, should be json or image")
+		c.String(http.StatusBadRequest, "format parameter is invalid, should be json or image")
 		return
 	}
 
 	if imageFormat != "jpg" && imageFormat != "webp" {
-		c.String(http.StatusInternalServerError, "image_format parameter is invalid, should be jpg or webp")
+		c.String(http.StatusBadRequest, "image_format parameter is invalid, should be jpg or webp")
 		return
 	}
 
 	// fetch bing information
 	response, err := bing_wallpaper.Get(uint(uIndex), mkt, resolution)
 	if err != nil {
-		c.String(http.StatusInternalServerError, err.Error())
+		c.String(http.StatusBadGateway, err.Error())
 		return
 	}
 
 	// check the image format
-	if imageFormat == "webp" {
-		response.URL = response.URL[:len(response.URL)-3] + "webp"
+	if imageFormat == "webp" && strings.HasSuffix(response.URL, ".jpg") {
+		response.URL = strings.TrimSuffix(response.URL, ".jpg") + ".webp"
 	}
 
 	// redirect to image URL directly

@@ -1,7 +1,6 @@
 package run
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/TimothyYe/bing-wallpaper/handler"
@@ -40,9 +39,8 @@ func run(cmd *cobra.Command, args []string) {
 	router.Use(CORSMiddleware())
 	router.GET("/", handler.RootHandler)
 
+	log.Println("API is running on :9000...")
 	if err := router.Run(":9000"); err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println("API is running...")
 }

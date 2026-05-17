@@ -72,22 +72,14 @@ func init() {
 
 // Get bing.com wallpaper from bing api
 func Get(index uint, market, resolution string) (*Response, error) {
-	if _, ok := Resolution[resolution]; !ok {
-		// get the full resolution
-		if _, ok := FullResolution[resolution]; !ok {
+	suffix, ok := Resolution[resolution]
+	if !ok {
+		suffix, ok = FullResolution[resolution]
+		if !ok {
 			return nil, fmt.Errorf("resolution %s is not supported", resolution)
 		}
 	}
-
-	// fetch from the old resolution
-	if _, ok := Resolution[resolution]; ok {
-		resolution = Resolution[resolution]
-	}
-
-	// replace the resolution with the full resolution
-	if _, ok := FullResolution[resolution]; ok {
-		resolution = FullResolution[resolution]
-	}
+	resolution = suffix
 
 	// query cache first
 	if value, err := cache.Get(fmt.Sprintf("%d_%s_%s", index, market, resolution)); err == nil {
