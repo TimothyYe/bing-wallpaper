@@ -80,7 +80,7 @@ func RootHandler(c *gin.Context) {
 	}
 
 	// fetch bing information
-	response, err := bing_wallpaper.Get(uint(uIndex), mkt, resolution)
+	response, err := bing_wallpaper.Get(c.Request.Context(), uint(uIndex), mkt, resolution)
 	if err != nil {
 		c.String(http.StatusBadGateway, err.Error())
 		return

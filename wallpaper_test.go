@@ -1,18 +1,20 @@
 package bing_wallpaper
 
 import (
-	"github.com/stretchr/testify/assert"
+	"context"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGet(t *testing.T) {
-	resp, err := Get(0, "zh-CN", "3840")
+	resp, err := Get(context.Background(), 0, "zh-CN", "3840")
 	assert.NoError(t, err)
 	assert.NotNil(t, resp)
 	assert.NotEmpty(t, resp.URL)
 }
 
-func TestGetCauseErr(t *testing.T) {
-	_, err := Get(0, "zh-TW", "1920")
+func TestGetUnsupportedResolution(t *testing.T) {
+	_, err := Get(context.Background(), 0, "zh-CN", "9999")
 	assert.Error(t, err)
 }
