@@ -3,11 +3,10 @@ module github.com/TimothyYe/bing-wallpaper
 go 1.26.0
 
 require (
-	github.com/allegro/bigcache/v3 v3.1.0
-	github.com/beevik/etree v1.1.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/spf13/cobra v1.3.0
 	github.com/stretchr/testify v1.8.3
+	golang.org/x/sync v0.20.0
 )
 
 require (

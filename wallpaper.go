@@ -1,28 +1,55 @@
 package bing_wallpaper
 
 import (
-	"context"
-	"encoding/json"
+	"encoding/xml"
 	"fmt"
-	"io"
-	"log"
 	"net/http"
+	"sync"
 	"time"
 
-	"github.com/allegro/bigcache/v3"
-	"github.com/beevik/etree"
+	"golang.org/x/sync/singleflight"
 )
 
 const (
-	bingURL = `https://www.bing.com`
-	bingAPI = `https://www.bing.com/HPImageArchive.aspx?format=xml&idx=%d&n=1&mkt=%s`
+	bingURL   = `https://www.bing.com`
+	bingAPI   = `https://www.bing.com/HPImageArchive.aspx?format=xml&idx=%d&n=1&mkt=%s`
+	userAgent = `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0`
+
+	// index 0 is "today" and can rotate at any time; older indices are
+	// immutable so they can be cached aggressively.
+	ttlCurrent  = 1 * time.Hour
+	ttlArchived = 7 * 24 * time.Hour
 )
 
 var (
 	Resolution     map[string]string
 	FullResolution map[string]string
-	cache          *bigcache.BigCache
+
+	httpClient = &http.Client{Timeout: 5 * time.Second}
+
+	cacheMu sync.RWMutex
+	cache   = make(map[string]cacheEntry)
+
+	sfGroup singleflight.Group
 )
+
+type cacheEntry struct {
+	resp    Response
+	expires time.Time
+}
+
+type bingImage struct {
+	StartDate     string `xml:"startdate"`
+	EndDate       string `xml:"enddate"`
+	URLBase       string `xml:"urlBase"`
+	Copyright     string `xml:"copyright"`
+	CopyrightLink string `xml:"copyrightlink"`
+}
+
+type bingResponse struct {
+	XMLName xml.Name  `xml:"images"`
+	Image   bingImage `xml:"image"`
+}
 
 func init() {
 	Resolution = map[string]string{
@@ -49,25 +76,24 @@ func init() {
 		"320x240":   "320x240.jpg",
 		"240x320":   "240x320.jpg",
 	}
+}
 
-	// initialize the cache
-	config := bigcache.Config{
-		Shards:             128,
-		LifeWindow:         60 * time.Minute,
-		CleanWindow:        10 * time.Minute,
-		MaxEntriesInWindow: 30 * 60,
-		MaxEntrySize:       50,
-		Verbose:            true,
-		HardMaxCacheSize:   256,
-		OnRemove:           nil,
-		OnRemoveWithReason: nil,
+// cacheGet returns a value copy so callers can mutate without affecting
+// the cached entry or other concurrent callers.
+func cacheGet(key string) (Response, bool) {
+	cacheMu.RLock()
+	entry, ok := cache[key]
+	cacheMu.RUnlock()
+	if !ok || time.Now().After(entry.expires) {
+		return Response{}, false
 	}
+	return entry.resp, true
+}
 
-	var initErr error
-	cache, initErr = bigcache.New(context.Background(), config)
-	if initErr != nil {
-		log.Fatal(initErr)
-	}
+func cacheSet(key string, resp Response, ttl time.Duration) {
+	cacheMu.Lock()
+	cache[key] = cacheEntry{resp: resp, expires: time.Now().Add(ttl)}
+	cacheMu.Unlock()
 }
 
 // Get bing.com wallpaper from bing api
@@ -81,63 +107,60 @@ func Get(index uint, market, resolution string) (*Response, error) {
 	}
 	resolution = suffix
 
-	// query cache first
-	if value, err := cache.Get(fmt.Sprintf("%d_%s_%s", index, market, resolution)); err == nil {
-		cachedResp := &Response{}
-		_ = json.Unmarshal(value, cachedResp)
-		return cachedResp, nil
+	key := fmt.Sprintf("%d_%s_%s", index, market, resolution)
+
+	if resp, ok := cacheGet(key); ok {
+		return &resp, nil
 	}
 
-	client := &http.Client{
-		Timeout: 5 * time.Second,
-	}
+	v, err, _ := sfGroup.Do(key, func() (any, error) {
+		// recheck after singleflight serialization in case another caller
+		// already populated the cache while we waited.
+		if resp, ok := cacheGet(key); ok {
+			return resp, nil
+		}
 
-	request, err := http.NewRequest(http.MethodGet, fmt.Sprintf(bingAPI, index, market), nil)
+		req, err := http.NewRequest(http.MethodGet, fmt.Sprintf(bingAPI, index, market), nil)
+		if err != nil {
+			return Response{}, err
+		}
+		req.Header.Set("Referer", bingURL)
+		req.Header.Set("User-Agent", userAgent)
+
+		httpResp, err := httpClient.Do(req)
+		if err != nil {
+			return Response{}, err
+		}
+		defer httpResp.Body.Close()
+
+		var br bingResponse
+		if err := xml.NewDecoder(httpResp.Body).Decode(&br); err != nil {
+			return Response{}, fmt.Errorf("failed to parse bing response: %w", err)
+		}
+		if br.Image.URLBase == "" {
+			return Response{}, fmt.Errorf("empty image element in bing response")
+		}
+
+		response := Response{
+			StartDate:     br.Image.StartDate,
+			EndDate:       br.Image.EndDate,
+			URL:           fmt.Sprintf("%s%s_%s", bingURL, br.Image.URLBase, resolution),
+			Copyright:     br.Image.Copyright,
+			CopyrightLink: br.Image.CopyrightLink,
+		}
+
+		ttl := ttlArchived
+		if index == 0 {
+			ttl = ttlCurrent
+		}
+		cacheSet(key, response, ttl)
+		return response, nil
+	})
 	if err != nil {
 		return nil, err
 	}
-	request.Header.Add("Referer", bingURL)
-	request.Header.Add("User-Agent", `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0`)
-
-	resp, err := client.Do(request)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to parse request body from %s", bingURL)
-	}
-
-	doc := etree.NewDocument()
-	if err := doc.ReadFromBytes(body); err != nil {
-		return nil, err
-	}
-
-	// get image element - root element is "images"
-	root := doc.Root()
-	if root == nil {
-		return nil, fmt.Errorf("failed to parse XML response from %s", bingURL)
-	}
-
-	imgElem := root.SelectElement("image")
-	if imgElem == nil {
-		return nil, fmt.Errorf("failed to find 'image' element in response from %s", bingURL)
-	}
-
-	response := &Response{
-		StartDate:     imgElem.SelectElement("startdate").Text(),
-		EndDate:       imgElem.SelectElement("enddate").Text(),
-		URL:           fmt.Sprintf("%s%s_%s", bingURL, imgElem.SelectElement("urlBase").Text(), resolution),
-		Copyright:     imgElem.SelectElement("copyright").Text(),
-		CopyrightLink: imgElem.SelectElement("copyrightlink").Text(),
-	}
-
-	// cache the response
-	if value, err := json.Marshal(response); err == nil {
-		_ = cache.Set(fmt.Sprintf("%d_%s_%s", index, market, resolution), value)
-	}
-
-	return response, nil
+	// singleflight shares the returned value across all callers; copy so
+	// each caller gets its own pointer and downstream mutations cannot race.
+	out := v.(Response)
+	return &out, nil
 }
